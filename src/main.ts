@@ -38,7 +38,7 @@ const downloadAllSvgs = svgUrls => {
     download({
       name: `${item.name}.svg`,
       url: item.url,
-      path: path.resolve(__dirname, 'svg')
+      path: path.resolve(process.env.GITHUB_WORKSPACE, 'svg')
     })
   );
   return Promise.all(downloadAll);
