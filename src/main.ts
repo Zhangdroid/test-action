@@ -34,6 +34,7 @@ const getFigmaSvgUrls = async (fileKey, nodeId) => {
 };
 
 const downloadAllSvgs = svgUrls => {
+  core.info(`path: ${path.resolve(process.env.GITHUB_WORKSPACE, 'svg')}`);
   const downloadAll = svgUrls.map(item =>
     download({
       name: `${item.name}.svg`,
