@@ -1,5 +1,7 @@
+import {error} from '@actions/core';
+
 const core = require('@actions/core');
-const exec = require('@actions/exec');
+const {exec} = require('child_process');
 const path = require('path');
 
 const {getNode, getSvgs} = require('./figmaAPI');
@@ -45,16 +47,22 @@ const downloadAllSvgs = svgUrls => {
   return Promise.all(downloadAll);
 };
 
-const commit = async () => {
-  await exec.exec('git', [
-    `config --local user.name ${process.env.GITHUB_ACTOR}`
-  ]);
-  await exec.exec('git', [
-    `config --global user.email '${process.env.GITHUB_ACTOR}@users.noreply.github.com'`
-  ]);
-  await exec.exec('git', ['add -A']);
-  await exec.exec('git', ["commit -m '[feat]添加新的 icon'"]);
-  await exec.exec('git', ['push -u origin HEAD']);
+const commit = () => {
+  return new Promise((resolve, reject) => {
+    exec(
+      `git config --global user.name '${process.env.GITHUB_ACTOR}' \\
+      && git config --global user.email '${process.env.GITHUB_ACTOR}@users.noreply.github.com' \\
+      && git add -A && git commit -m '$*' --allow-empty \\
+      && git push -u origin HEAD`,
+      error => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      }
+    );
+  });
 };
 
 run();
